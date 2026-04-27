@@ -1,132 +1,168 @@
-# Node class
-class Node:
-    def __init__(self, data):
-        self.data = data
-        self.next = None
+#include <stdio.h>
+#include <stdlib.h>
 
+// Node structure
+struct Node {
+    int data;
+    struct Node* next;
+};
 
-# Linked List class
-class LinkedList:
-    def __init__(self):
-        self.head = None
+struct Node* head = NULL;
 
-    # Insert at beginning
-    def insert_begin(self, data):
-        new_node = Node(data)
-        new_node.next = self.head
-        self.head = new_node
+// Insert at beginning
+void insert_begin(int data) {
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
+    new_node->data = data;
+    new_node->next = head;
+    head = new_node;
+}
 
-    # Insert at end
-    def insert_end(self, data):
-        new_node = Node(data)
-        if self.head is None:
-            self.head = new_node
-            return
-        
-        temp = self.head
-        while temp.next:
-            temp = temp.next
-        
-        temp.next = new_node
+// Insert at end
+void insert_end(int data) {
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
+    new_node->data = data;
+    new_node->next = NULL;
 
-    # Insert at position
-    def insert_pos(self, pos, data):
-        new_node = Node(data)
-        
-        if pos == 0:
-            self.insert_begin(data)
-            return
-        
-        temp = self.head
-        for i in range(pos - 1):
-            if temp is None:
-                print("Position out of range")
-                return
-            temp = temp.next
-        
-        new_node.next = temp.next
-        temp.next = new_node
+    if (head == NULL) {
+        head = new_node;
+        return;
+    }
 
-    # Delete from beginning
-    def delete_begin(self):
-        if self.head is None:
-            print("List is empty")
-            return
-        self.head = self.head.next
+    struct Node* temp = head;
+    while (temp->next != NULL) {
+        temp = temp->next;
+    }
 
-    # Delete from end
-    def delete_end(self):
-        if self.head is None:
-            print("List is empty")
-            return
-        
-        if self.head.next is None:
-            self.head = None
-            return
-        
-        temp = self.head
-        while temp.next.next:
-            temp = temp.next
-        
-        temp.next = None
+    temp->next = new_node;
+}
 
-    # Delete by value
-    def delete_value(self, key):
-        temp = self.head
-        
-        if temp and temp.data == key:
-            self.head = temp.next
-            return
-        
-        prev = None
-        while temp and temp.data != key:
-            prev = temp
-            temp = temp.next
-        
-        if temp is None:
-            print("Value not found")
-            return
-        
-        prev.next = temp.next
+// Insert at position
+void insert_pos(int pos, int data) {
+    if (pos == 0) {
+        insert_begin(data);
+        return;
+    }
 
-    # Search element
-    def search(self, key):
-        temp = self.head
-        pos = 0
-        
-        while temp:
-            if temp.data == key:
-                return pos
-            temp = temp.next
-            pos += 1
-        
-        return -1
+    struct Node* new_node = (struct Node*)malloc(sizeof(struct Node));
+    new_node->data = data;
 
-    # Display list
-    def display(self):
-        temp = self.head
-        while temp:
-            print(temp.data, end=" -> ")
-            temp = temp.next
-        print("None")
+    struct Node* temp = head;
+    for (int i = 0; i < pos - 1; i++) {
+        if (temp == NULL) {
+            printf("Position out of range\n");
+            return;
+        }
+        temp = temp->next;
+    }
 
+    new_node->next = temp->next;
+    temp->next = new_node;
+}
 
-# Driver code
-ll = LinkedList()
+// Delete from beginning
+void delete_begin() {
+    if (head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
 
-ll.insert_begin(10)
-ll.insert_begin(5)
-ll.insert_end(20)
-ll.insert_pos(1, 15)
+    struct Node* temp = head;
+    head = head->next;
+    free(temp);
+}
 
-print("Linked List:")
-ll.display()
+// Delete from end
+void delete_end() {
+    if (head == NULL) {
+        printf("List is empty\n");
+        return;
+    }
 
-print("Search 15:", ll.search(15))
+    if (head->next == NULL) {
+        free(head);
+        head = NULL;
+        return;
+    }
 
-ll.delete_begin()
-ll.delete_end()
-ll.delete_value(15)
+    struct Node* temp = head;
+    while (temp->next->next != NULL) {
+        temp = temp->next;
+    }
 
-print("After Deletions:")
-ll.display()
+    free(temp->next);
+    temp->next = NULL;
+}
+
+// Delete by value
+void delete_value(int key) {
+    struct Node* temp = head;
+    struct Node* prev = NULL;
+
+    if (temp != NULL && temp->data == key) {
+        head = temp->next;
+        free(temp);
+        return;
+    }
+
+    while (temp != NULL && temp->data != key) {
+        prev = temp;
+        temp = temp->next;
+    }
+
+    if (temp == NULL) {
+        printf("Value not found\n");
+        return;
+    }
+
+    prev->next = temp->next;
+    free(temp);
+}
+
+// Search element
+int search(int key) {
+    struct Node* temp = head;
+    int pos = 0;
+
+    while (temp != NULL) {
+        if (temp->data == key) {
+            return pos;
+        }
+        temp = temp->next;
+        pos++;
+    }
+
+    return -1;
+}
+
+// Display list
+void display() {
+    struct Node* temp = head;
+
+    while (temp != NULL) {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
+    }
+    printf("NULL\n");
+}
+
+// Main function
+int main() {
+    insert_begin(10);
+    insert_begin(5);
+    insert_end(20);
+    insert_pos(1, 15);
+
+    printf("Linked List:\n");
+    display();
+
+    printf("Search 15: %d\n", search(15));
+
+    delete_begin();
+    delete_end();
+    delete_value(15);
+
+    printf("After Deletions:\n");
+    display();
+
+    return 0;
+}
