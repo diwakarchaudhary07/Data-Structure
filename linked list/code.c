@@ -50,6 +50,7 @@ void display() {
     printf("NULL\n");
 }
 
+
 // Main function
 int main() {
     insertBegin(10);
